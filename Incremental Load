@@ -1,0 +1,35 @@
+from delta import DeltaTable
+from pyspark.sql import Window
+from pyspark.sql.functions import dense_rank, desc,col
+
+df = spark.read.table("ankit_cata.products_data.products")
+
+#deduplicate the ids based on latest date
+
+window_spec = Window.partitionBy('id').orderBy(col('update_date').desc())
+df = df.withColumn('rnk', dense_rank().over(window_spec))\
+    .filter(col('rnk')==1).drop("rnk")
+
+df.display()
+........................................................................................................................................................
+
+#if the file is already present then perform upsert else write the data to target 
+
+if len(dbutils.fs.ls("/Volumes/ankit_cata/products_data/target_volume/data"))>0:
+    #incremental load and backfill using s.update_date>=t.update_date
+    target_obj = DeltaTable.forPath(spark, '/Volumes/ankit_cata/products_data/target_volume/data')
+    target_obj.alias('trg').merge(df.alias('src'), 
+                                "trg.id == src.id")\
+                                    .whenMatchedUpdateAll(condition= "src.update_date>= trg.update_date")\
+                                        .whenNotMatchedInsertAll()\
+                                            .execute()
+    print("update")
+else:
+    #initial Load
+    df.write.format('delta')\
+        .mode("overwrite")\
+            .save("/Volumes/ankit_cata/products_data/target_volume/data")
+    print("insert")
+
+
+.............................................................................................................................................................
