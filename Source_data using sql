@@ -1,0 +1,28 @@
+create table products (
+    id int,
+    name varchar(500),
+    product_name varchar(500),
+    amount int,
+    update_date timestamp
+)
+
+insert into ankit_cata.products_data.products
+values
+    (1, "ankit", "mobile", 1000, current_timestamp()),
+    (2, "sunit", "laptop", 5000, current_timestamp()),
+    (3, "mohit", "charger", 3000, current_timestamp()),
+    (4, "ruchi", "datacable", 4000, current_timestamp()),
+    (5, "nitika", "shop", 8000, current_timestamp())
+
+    --increamental data
+
+    insert into ankit_cata.products_data.products
+values
+    (6, "sumit", "mobile", 50100, current_timestamp()),
+    (7, "raheem", "laptop", 4000, current_timestamp()),
+    (3, "mohit", "iphone", 9000, current_timestamp()),
+    (4, "suruchi", "microscop", 2000, current_timestamp()),
+    (8, "ambika", "cream", 8000, current_timestamp())
+
+
+select * from ankit_cata.products_data.products
